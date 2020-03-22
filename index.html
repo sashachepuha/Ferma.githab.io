@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sergey Batukov</title>
+</head>
+<body>
+    <canvas id="game"></canvas>
+    <div class="UI">
+        <span id="money"></span>
+        <div class="resource">
+            <div class="resourse__item">
+                <img class="item__icon" src="img/milk.png">
+                <span class="item__val" id="milk__val"></span>
+            </div>
+            <div class="resourse__item">
+                <img class="item__icon" src="img/egg.png">
+                <span class="item__val" id="egg__val"></span>
+            </div>
+            <button class="sell" onclick="sell()">продать</button>
+        </div>
+        <div class="shop">
+            <div class="shop__item">
+                <img class="item__icon" src="img/chicken.png">
+                <span class="item__price" id="chicken__price">15 монет</span>
+                <button class="bay" onclick="bayChicken()">купить</button>
+            </div>
+            <div class="shop__item">
+                <img class="item__icon" src="img/cow.png">
+                <span class="item__price" id="cow__price">30 монет</span>
+                <button class="bay" onclick="bayCow()">купить</button>
+            </div>
+            <div class="shop__item">
+                <img class="item__icon" src="img/wheat.png">
+                <span class="item__price" id="cow__price">10 монет</span>
+                <button class="bay" onclick="bayWheat()">купить</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .UI {
+            position: absolute;
+            left: 900px;
+            top:100px;
+            width: 400px;
+        }
+        #money {
+            position: relative;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 16px;
+            margin: 1px;
+            display: block;
+        }
+        .resource, .shop {
+            display: flex;
+            justify-content: space-around;
+            position: relative;
+            border: solid 2px black;
+            padding: 20px;
+            margin: 20px;
+        }
+        .resourse__item, .shop__item {
+            position: relative;
+            display: block;
+        }
+        .item__val, .item__price {
+            position: absolute;
+            left: 0px;
+            top: 86px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .sell, .bay{
+            display: block;
+            padding: 10px 0px;
+            width: 100px;
+            border: solid 2px black;
+            background-color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
+        .sell:hover, .bay:hover {
+            background-color: black;
+            color: white;
+        }
+
+    </style>
+    <script src='js/main.js'></script>
+</body>
+</html>
