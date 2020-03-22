@@ -6,19 +6,23 @@ cvs.width = width
 cvs.height = height
 
 // персонажи на старте
-var cowAmount = 5
 var chickenAmount = 6
 var wheatAmount = 3
+var cowAmount = 5
+
+// игровая скорость
+var speed = 1
 
 // сторона игрового поля
 var fieldSize = 8
 
 var resource = []
 var products = []
-
 var milkSum = 0
 var eggSum = 0
 var money = 0
+var barn = 0
+
 
 // объект сущности
 class Essence {
@@ -71,8 +75,8 @@ class Essence {
         if (this.time >= this.step && this.time%this.step == 0){
             var interval = setInterval(() => {
                 if (this.time != 0){
-                    this.time -= 1
-                    this.progres += 1
+                    this.time -= speed
+                    this.progres += speed
                     this.progresValue = this.progres / this.step * 100
                 }
                 if (this.progres%this.step == 0) {
@@ -126,6 +130,7 @@ makeEssence(cowAmount, Cow)
 makeEssence(chickenAmount, Chicken)
 makeEssence(wheatAmount, Wheat)
 
+// Игровые манипуляции
 var sell = function() {
     money += (eggSum * 5) + (milkSum * 10)
     eggSum = 0,
@@ -145,11 +150,85 @@ var bay = function(price, obj){
     }
 }
 
+var distribute = function(){
+    if(money >= 10){
+        money -= 10
+        for (i in essences){
+            if(essences[i].name != 'wheat'&&resource.length != 0&&essences[i].time == 0&& resource.length > 0){
+                essences[i].getResource()
+                if (essences[i].name == 'cow'){
+                    essences[i].timer('milk', products)
+                }
+                if (essences[i].name == 'chicken'){
+                    essences[i].timer('egg', products)
+                }
+                resource.splice(0, 1)
+            }
+            if (essences[i].name == 'wheat'&& essences[i].time == 0){
+                essences[i].time = 10
+                essences[i].timer('wheat', resource)
+            }
+        }
+    }
+    else { alert('не в этот раз(')}
+    console.log(resource)
+
+}
+
+var collect = function(){
+    if(money >= 10){
+        money -= 10
+        for (i in products){
+            if (products[i].name == 'milk'){
+                milkSum += 1
+            }
+            if (products[i].name == 'egg') {
+                eggSum += 1
+            }
+        }
+        products.splice(0,products.length);
+    }
+    else { alert('сначала монетки!')}
+}
+
+var getWheat = function(){
+    if (barn != 0){
+        var wheat = new Essence('wheat', mouse.x, mouse.y, 'img/wheat1.png')
+        selected = wheat
+        resource.push(wheat)
+        barn -= 1
+    }
+}
+
+var acceleration = function(){
+    if(money >= 100){
+        var t = 20
+        for (i in essences){
+            essences[i].time = 0
+            essences[i].progres = 0
+        }
+        speed = 5
+        var timer  = setInterval(() => {
+            if (t != 0){
+                document.getElementById('acceleration').innerText = t + " сек."
+            }
+            else {
+                speed = 1
+                document.getElementById('acceleration').innerText = 'Ускорение Х5 (100 монет)'
+                clearInterval(timer)
+            }
+            t -= 1
+        }, 1000);
+    }
+    else {alert('ДОРОГО!')}
+}
+
 // работа с курсором
 var mouse = {
     x : 0,
     y : 0
 }
+
 // выделеный объект
 var selected = false
 
@@ -158,11 +237,13 @@ var isCursorIn = function (essence) {
     return mouse.x > essence.x && mouse.x < essence.x + essence.img.width &&
     mouse.y > essence.y && mouse.y < essence.y + essence.img.height
 }
+
 // отрисовка
 setInterval(function(){
     document.getElementById('egg__val').innerText = "x " + eggSum
     document.getElementById('milk__val').innerText = "x " + milkSum
     document.getElementById('money').innerText = money + " монет"
+    document.getElementById('wheat-sum').innerText = "x " + barn
     ctx.clearRect(0, 0, cvs.width, cvs.height)
     for (i in field) {
         field[i].draw()
@@ -248,6 +329,9 @@ window.onmouseup = function() {
         if (isCursorIn(essences[i])&&selected.name == 'wheat'&&essences[i].name == 'cow') {
             essences[i].getResource()
             essences[i].timer('milk', products)
+        }
+        if (isCursorIn(essences[i])&&selected.name == 'wheat'&&essences[i].name == 'wheat') {
+            barn += 1
         }
     }
     // перемешение объекта

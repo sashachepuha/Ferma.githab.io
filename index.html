@@ -8,34 +8,45 @@
 <body>
     <canvas id="game"></canvas>
     <div class="UI">
-        <span id="money"></span>
-        <div class="resource">
-            <div class="resourse__item">
+        <div class="form">
+            <span id="money"></span>
+        </div>
+        <div class="form">
+            <button class="btn" onclick="distribute()">раздать пшеницу (10 монет)</button>
+            <button class="btn" onclick="collect()">собрать продукты (10 монет)</button>
+            <button class="btn" id="acceleration" onclick="acceleration()">Ускорение Х5 (100 монет)</button>
+        </div>
+        <div class="form">
+            <div class="form__item">
                 <img class="item__icon" src="img/milk.png">
                 <span class="item__val" id="milk__val"></span>
             </div>
-            <div class="resourse__item">
+            <div class="form__item">
                 <img class="item__icon" src="img/egg.png">
                 <span class="item__val" id="egg__val"></span>
             </div>
             <button class="sell" onclick="sell()">продать</button>
         </div>
-        <div class="shop">
-            <div class="shop__item">
+        <div class="form">
+            <div class="form__item">
                 <img class="item__icon" src="img/chicken.png">
                 <span class="item__price" id="chicken__price">15 монет</span>
                 <button class="bay" onclick="bay(15, Chicken)">купить</button>
             </div>
-            <div class="shop__item">
+            <div class="form__item">
                 <img class="item__icon" src="img/cow.png">
                 <span class="item__price" id="cow__price">30 монет</span>
                 <button class="bay" onclick="bay(30, Cow)">купить</button>
             </div>
-            <div class="shop__item">
+            <div class="form__item">
                 <img class="item__icon" src="img/wheat.png">
                 <span class="item__price" id="cow__price">10 монет</span>
                 <button class="bay" onclick="bay(10, Wheat)">купить</button>
             </div>
+        </div>
+        <div class="form">
+            <img class="item__icon" src="img/barn.png" onclick="getWheat()">
+            <span id="wheat-sum">x 10</span>
         </div>
     </div>
 
@@ -43,7 +54,7 @@
         .UI {
             position: absolute;
             left: 900px;
-            top:100px;
+            top: 0px;
             width: 400px;
         }
         #money {
@@ -53,7 +64,14 @@
             margin: 1px;
             display: block;
         }
-        .resource, .shop {
+        #wheat-sum{
+            position: absolute;
+            right: 50px;
+            top: 60px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .form {
             display: flex;
             justify-content: space-around;
             position: relative;
@@ -61,7 +79,7 @@
             padding: 20px;
             margin: 20px;
         }
-        .resourse__item, .shop__item {
+        .form__item {
             position: relative;
             display: block;
         }
@@ -72,7 +90,7 @@
             font-family: Arial, Helvetica, sans-serif;
             font-size: 14px;
         }
-        .sell, .bay{
+        .sell, .bay, .btn{
             display: block;
             padding: 10px 0px;
             width: 100px;
@@ -82,7 +100,11 @@
             font-size: 14px;
             text-transform: uppercase;
         }
-        .sell:hover, .bay:hover {
+        .btn {
+            width: 150px;
+            padding: 10px 20px;
+        }
+        .sell:hover, .bay:hover, .btn:hover{
             background-color: black;
             color: white;
         }
