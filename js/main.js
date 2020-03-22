@@ -5,10 +5,20 @@ var width = 1500, height = 1500
 cvs.width = width
 cvs.height = height
 
+// персонажи на старте
 var cowAmount = 5
 var chickenAmount = 6
 var wheatAmount = 3
+
+// сторона игрового поля
 var fieldSize = 8
+
+var resource = []
+var products = []
+
+var milkSum = 0
+var eggSum = 0
+var money = 0
 
 // объект сущности
 class Essence {
@@ -76,24 +86,10 @@ class Essence {
         }
     }
 }
-// работа с курсором
-var mouse = {
-    x : 0,
-    y : 0
-}
-
-var selected = false
-
-// проверка находится ли курсор над обьектом
-var isCursorIn = function (essence) {
-    return mouse.x > essence.x && mouse.x < essence.x + essence.img.width &&
-    mouse.y > essence.y && mouse.y < essence.y + essence.img.height
-}
-
 
 // игровое поле
 var stepX = 100, stepY = -100, j=0
-var i = 0, field = [], essences = []
+var i = 0, field = []
 for(; i<(fieldSize * fieldSize); i++) {
     if (i%fieldSize == 0){
         stepY += stepX
@@ -104,102 +100,64 @@ for(; i<(fieldSize * fieldSize); i++) {
 }
 
 // создаем сушности
+var essences = []
+var Cow = new Essence('cow', 0, 0, 'img/cow.png')
+var Chicken = new Essence('chicken', 0, 0, 'img/chicken.png')
+var Wheat = new Essence('wheat', 0, 0, 'img/wheat.png')
 
-j = 0
-i = 0
-stepY = -100
-
-// коровы
-for(; i<cowAmount; i++) {
-    if (i%fieldSize == 0){
-        stepY += stepX
-        j = 0
-    }
-    essences.push(new Essence('cow', j * stepX, stepY, 'img/cow.png'))
-    field[i].isEmpty = false
-    j += 1
-}
-
-// курицы
-for(; i<chickenAmount+cowAmount; i++) {
-    if (i%fieldSize == 0){
-        stepY += stepX
-        j = 0
-    }
-    essences.push(new Essence('chicken', j * stepX, stepY, 'img/chicken.png'))
-    field[i].isEmpty = false
-    j += 1
-}
-
-// пшеница
-for(; i<chickenAmount+cowAmount+wheatAmount; i++) {
-    if (i%fieldSize == 0){
-        stepY += stepX
-        j = 0
-    }
-    essences.push(new Essence('wheat', j * stepX, stepY, 'img/wheat.png'))
-    field[i].isEmpty = false
-    j += 1
-}
-
-var resource = []
-var products = []
-
-// стартовая пшеница
-for (i in essences){
-    if (essences[i].name == "wheat"){
-        essences[i].timer('wheat', resource)
+var makeEssence = function(Amount, obj){
+    var j = 0
+    for (i in field){
+        if(field[i].isEmpty == true){
+            obj.x = field[i].x
+            obj.y = field[i].y
+            essences.push(new Essence(obj.name, obj.x, obj.y, obj.img.src))
+            essences[i].timer('wheat', resource)
+            field[i].isEmpty = false
+            j += 1
+            if (j == Amount) {
+                break
+            }
+        }
     }
 }
 
-milkIcon = new Image()
-milkIcon.src = 'img/milk.png'
-var milkSum = 0
-eggIcon = new Image()
-eggIcon.src = 'img/egg.png'
-var eggSum = 0
-var money = 0
+makeEssence(cowAmount, Cow)
+makeEssence(chickenAmount, Chicken)
+makeEssence(wheatAmount, Wheat)
 
 var sell = function() {
     money += (eggSum * 5) + (milkSum * 10)
     eggSum = 0,
     milkSum = 0
 } 
-var bayChicken = function(){
-    if (money >= 15){
-        var chicken = (new Essence('chicken', mouse.x, mouse.y, 'img/chicken.png'))
-        selected = chicken
-        essences.push(chicken)
-        money -= 15
-    }
-    else {
-        alert('Не хватает монеток')
-    }
-}
-var bayCow = function(){
-    if (money >= 30){
-        var cow = (new Essence('cow', mouse.x, mouse.y, 'img/cow.png'))
-        selected = cow
-        essences.push(cow)
-        money -= 30
-    }
-    else {
-        alert('Не хватает монеток')
-    }
-}
-var bayWheat = function(){
-    if (money >= 10){
-        var wheat = (new Essence('wheat', mouse.x, mouse.y, 'img/wheat.png'))
-        wheat.timer('wheat', resource)
-        selected = wheat
-        essences.push(wheat)
-        money -= 10
+
+var bay = function(price, obj){
+    if(money >= price){
+        var essence = new Essence(obj.name, mouse.x, mouse.y, obj.img.src)
+        selected = essence
+        essences.push(essence)
+        selected.timer('wheat', resource)
+        money -= price
     }
     else {
         alert('Не хватает монеток')
     }
 }
 
+// работа с курсором
+var mouse = {
+    x : 0,
+    y : 0
+}
+// выделеный объект
+var selected = false
+
+// проверка находится ли курсор над обьектом
+var isCursorIn = function (essence) {
+    return mouse.x > essence.x && mouse.x < essence.x + essence.img.width &&
+    mouse.y > essence.y && mouse.y < essence.y + essence.img.height
+}
 // отрисовка
 setInterval(function(){
     document.getElementById('egg__val').innerText = "x " + eggSum
@@ -226,8 +184,6 @@ setInterval(function(){
     }
 }, 30)
 
-
-
 // события мыши
 window.onmousemove = function (e) {
     mouse.x = e.pageX
@@ -236,16 +192,20 @@ window.onmousemove = function (e) {
 
 var itemX, itemY
 window.onmousedown = function() {
+    // сбор продуктов
     for (i in products) {
         if (isCursorIn(products[i])&&products[i].name == 'milk') {
             milkSum += 1
             products.splice(i, 1)
         }
+    }
+    for (i in products) {
         if (isCursorIn(products[i])&&products[i].name == 'egg') {
             eggSum += 1
             products.splice(i, 1)
         }
     }
+    // перемешение объекта
     if(!selected) {
         for (i in essences) {
             if (isCursorIn(essences[i])) {
@@ -279,6 +239,7 @@ window.onmousedown = function() {
 }
 
 window.onmouseup = function() {
+    // постоянный рост пшеницы
     for (i in essences) {
         if (isCursorIn(essences[i])&&selected.name == 'wheat'&&essences[i].name == 'chicken') {
             essences[i].getResource()
@@ -289,6 +250,7 @@ window.onmouseup = function() {
             essences[i].timer('milk', products)
         }
     }
+    // перемешение объекта
     for (i in field) {
         if (isCursorIn(field[i])) {
             selected.x = field[i].x
